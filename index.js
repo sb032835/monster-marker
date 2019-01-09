@@ -35,7 +35,7 @@ module.exports = function markmob(mod) {
 				newMonsterEntry = JSON.parse(JSON.stringify(defaultConfig.newEntries))
 
 			if(config.allowAutoEntryRemoval === undefined) {
-				console.log('[Monster Marker] A new config option (allowAutoEntryRemoval) is added to allow this module to automatically clear old event monster entries. It is by default enabled, and you have to disable it in config.json before next login if you do not want this.');
+				console.log('[Monster Marker] 添加了新的配置選項（allowAutoEntryRemoval）以允許MOD自動清除舊的怪物名稱資訊。 它默認啟用，如果你不想這樣，你必須在下次進入遊戲之前在config.json中禁用它。');
 			}
 			else if(config.allowAutoEntryRemoval) {
 				for(let key of defaultConfig.deleteEntries) {	//Delete old unused entries for events that are over using deleteEntries
@@ -53,7 +53,7 @@ module.exports = function markmob(mod) {
 			delete config.newEntries
 			delete config.deleteEntries
 			save(config,'config.json')
-			console.log('[Monster Marker] Updated new config file. Current settings transferred over.')
+			console.log('[Monster Marker] 更新了新config文件. 轉換為當前設置.')
 		}
 		configInit()
 	}
@@ -66,24 +66,24 @@ module.exports = function markmob(mod) {
 		config.entriesVersion = defaultConfig.gameVersion
 		save(config,'config.json')
 		configInit()
-		console.log('[Monster Marker] New config file generated. Settings in config.json.')
+		console.log('[Monster Marker] 產生新的config文件. 設定為config.json.')
 	}		
 
 	
 ///////Commands
 	mod.command.add('warn', {
 		$default() {
-			mod.command.message('Invalid Command. Type "warn info" for help')
+			mod.command.message('無效指令. 輸入"warn info"獲得正確指令')
 		},
 		
 		info() {
 			mod.command.message(`Version: ${config.gameVersion}`)
-			mod.command.message('Commands: warn [arguments]\nArguments are as follows:\ntoggle: Enable/Disable Module\nalert: Toggle popup alerts\nmarker: Toggles markers spawn\nclear: Clears marker\nactive: Checks if module is active zone\nadd huntingZone templateId name: Adds the entry to the config')
+			mod.command.message('[相關指令] 如下:\n[warn toggle]:MOD 開啟 OR 關閉\n[warn alert]: 切換是否提示通知訊息\n[warn marker]: 切換是否顯示標記光束\n[warn clear]: 清除標記光束\n[warn active]: 檢查MOD是否在使用地區\n[warn add huntingZone templateId name]: 加入 區域_編號_怪物名稱 到config')
 		},
 		
 		toggle() {
 			enabled=!enabled
-			mod.command.message( enabled ? ' Module Enabled' : ' Module Disabled')
+			mod.command.message( enabled ? '世界王<font color="#56B4E9"> [開啟]' : '世界王<font color="#E69F00"> [關閉]')
 		
 			if(!enabled)
 				for(let itemid of mobid) despawnthis(itemid)
@@ -91,16 +91,16 @@ module.exports = function markmob(mod) {
 	
 		alert() {
 			alerts = !alerts
-			mod.command.message(alerts ? 'System popup notice enabled' : 'System popup notice disabled')
+			mod.command.message(alerts ? '通知提示<font color="#56B4E9"> [開啟]' : '通知提示<font color="#E69F00"> [關閉]')
 		},
 	
 		marker() {
 			markenabled = !markenabled
-			mod.command.message(markenabled ? 'Item Markers enabled' : 'Item Markers disabled')
+			mod.command.message(markenabled ? '標記光束<font color="#56B4E9"> [開啟]' : '標記光束<font color="#E69F00"> [關閉]')
 		},
 	
 		clear() {
-			mod.command.message('Item Markers Clear Attempted')
+			mod.command.message('取消標記光束')
 			for(let itemid of mobid) despawnthis(itemid)
 		},
 
@@ -128,9 +128,9 @@ module.exports = function markmob(mod) {
 				mobid.push(event.gameId)
 			}
 			
-			if(alerts) notice('Found '+ Monster_ID[`${event.huntingZoneId}_${event.templateId}`])
+			if(alerts) notice('發現 '+ Monster_ID[`${event.huntingZoneId}_${event.templateId}`])
 			 
-			if(messager) mod.command.message(' Found '+ Monster_ID[`${event.huntingZoneId}_${event.templateId}`])
+			if(messager) mod.command.message(' 發現 '+ Monster_ID[`${event.huntingZoneId}_${event.templateId}`])
 		}
 	
 		else if(specialMobSearch && event.bySpawnEvent) { //New def
@@ -139,9 +139,9 @@ module.exports = function markmob(mod) {
 				mobid.push(event.gameId)
 			}
 			
-			if(alerts) notice('Found Special Monster')
+			if(alerts) notice('<font color="#17fdd2">發現 特殊怪物')
 			
-			if(messager) mod.command.message('Found Special Monster')
+			if(messager) mod.command.message('<font color="#17fdd2">發現 特殊怪物')
 			//console.log(`Special mob:${event.huntingZoneId}_${event.templateId}`)
 		}
 			
@@ -149,6 +149,22 @@ module.exports = function markmob(mod) {
 
 	mod.hook('S_DESPAWN_NPC', 3, event => {
 		if(mobid.includes(event.gameId)) {
+			if (event.type == 5) {
+				if (alerted) {
+					notice(${name} + ' 死亡')
+				}
+				if (messager) {
+					mod.command.message(${name} + ' 死亡')
+				}
+			} if (event.type == 1) {
+				if (alerted) {
+					notice('超出範圍')
+				}
+				if (messager) {
+					mod.command.message('超出範圍')
+				}
+			}
+		}
 			despawnthis(event.gameId*100n),
 			mobid.splice(mobid.indexOf(event.gameId), 1)
 		}
@@ -198,7 +214,7 @@ module.exports = function markmob(mod) {
 		if(fileopen) {
 			fileopen=false
 			fs.writeFile(path.join(__dirname, ...args), JSON.stringify(data,null,"\t"), err => {
-				if(err) mod.command.message('Error Writing File, attempting to rewrite')
+				if(err) mod.command.message('寫入文件時出錯，嘗試重寫')
 				fileopen = true
 			})
 		}
