@@ -151,10 +151,10 @@ module.exports = function markmob(mod) {
 		if(mobid.includes(event.gameId)) {
 			if (event.type == 5) {
 				if (alerted) {
-					notice(${name} + ' 死亡')
+					notice(`${name}` + ' 死亡')
 				}
 				if (messager) {
-					mod.command.message(${name} + ' 死亡')
+					mod.command.message(`${name}` + ' 死亡')
 				}
 			} if (event.type == 1) {
 				if (alerted) {
@@ -167,7 +167,6 @@ module.exports = function markmob(mod) {
 		}
 			despawnthis(event.gameId*100n),
 			mobid.splice(mobid.indexOf(event.gameId), 1)
-		}
 	})
 	
 	mod.hook('S_LOAD_TOPO', 3, event => { //reset mobid list on location change
